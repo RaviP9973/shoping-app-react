@@ -1,11 +1,11 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'https://fakestoreapi.com';
+const API_BASE_URL = "https://fakestoreapi.com";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -13,12 +13,18 @@ export const login = async (username, password) => {
   try {
     // For testing purposes, we'll use a mock token if the API fails
     try {
-      const response = await api.post('/auth/login', { username, password });
+      const response = await api.post("/auth/login", { username, password });
       return response.data;
     } catch (error) {
       console.log("API login failed, using mock token");
       // Return a mock token for testing
-      return { token: "mock-jwt-token" };
+      return { 
+        token: "mock-jwt-token",
+        user: {
+          username,
+          email: `${username}@example.com` // Mock email
+        }
+      };
     }
   } catch (error) {
     throw error;
@@ -27,23 +33,25 @@ export const login = async (username, password) => {
 
 export const signup = async (userData) => {
   try {
-    // For testing purposes, we'll use a mock response if the API fails
-    try {
-      const response = await api.post('/users', userData);
-      return response.data;
-    } catch (error) {
-      console.log("API signup failed, using mock response");
-      // Return a mock response for testing
-      return { id: 1, ...userData };
-    }
+    const response = await api.post('/users', userData);
+    // Combine the API response (which only has id) with our user data
+    return {
+      ...response.data,
+      ...userData
+    };
   } catch (error) {
-    throw error;
+    console.log("API signup failed, using mock response");
+    // Return a mock response with all user data
+    return {
+      id: userData.id,
+      ...userData
+    };
   }
 };
 
 export const getProducts = async () => {
   try {
-    const response = await api.get('/products');
+    const response = await api.get("/products");
     return response.data;
   } catch (error) {
     throw error;
@@ -61,7 +69,7 @@ export const getProductById = async (id) => {
 
 export const getCategories = async () => {
   try {
-    const response = await api.get('/products/categories');
+    const response = await api.get("/products/categories");
     return response.data;
   } catch (error) {
     throw error;
@@ -75,4 +83,4 @@ export const getProductsByCategory = async (category) => {
   } catch (error) {
     throw error;
   }
-}; 
+};

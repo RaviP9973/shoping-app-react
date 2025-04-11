@@ -49,16 +49,27 @@ const Signup = () => {
     }
 
     try {
-      const response = await signup(formData.username, formData.email, formData.password);
+      // Add ID to the form data
+      const dataWithId = {
+        ...formData,
+        id: Math.floor(Math.random() * 1000) // Generate a random ID
+      };
       
-      if (response && response.token) {
-        localStorage.setItem('token', response.token);
-        navigate('/');
+      const response = await signup(dataWithId);
+      
+      console.log("response", response);
+      if (response && response.id) {
+        // Show success message and navigate to login
+        setError('Signup successful! Please login with your credentials.');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       } else {
         setError('Signup failed. Please try again.');
       }
     } catch (err) {
-      setError('Username or email already exists');
+      console.error("Signup error:", err);
+      setError(err.message || 'Username or email already exists');
     } finally {
       setLoading(false);
     }
